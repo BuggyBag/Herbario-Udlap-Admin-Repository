@@ -1,75 +1,84 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>UDLAP Herbarium System</title>
-    <link rel="stylesheet" href="/static/style.css">
+    <meta charset="UTF-8">
+    <title>UDLAP Herbarium ID System</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
 <div class="container">
 
-    <h1>UDLAP Herbarium Management System</h1>
+    <!-- HOME -->
+    <div id="home" class="menu">
+        <h1>UDLAP Herbarium</h1>
+        <button onclick="showSection('generate')">Generate IDs</button>
+        <button onclick="showSection('add')">Add New Register</button>
+        <button onclick="showSection('view')">View Database</button>
+        <button onclick="showSection('edit')">Edit Database</button>
+    </div>
 
-    <!-- HOME MENU -->
-    <div id="home" class="view active">
-        <div class="menu">
-            <button onclick="showView('generate')">Generate IDs</button>
-            <button onclick="showView('add')">Add New Register</button>
-            <button onclick="showView('view')">View Database</button>
-            <button onclick="showView('edit')">Edit Database</button>
+    <!-- GENERATE -->
+    <div id="generate" class="hidden">
+        <h1>Generate Occurrence ID</h1>
+        <input type="text" id="generatedId" readonly placeholder="Generated ID will appear here">
+        <button class="action-button" onclick="generateId()">Generate New ID</button>
+        <button class="action-button" onclick="copyToClipboard()">Copy to Clipboard</button>
+        <div id="generateNotification" class="notification"></div>
+        <button class="action-button back-button" onclick="goHome()">Back</button>
+    </div>
+
+    <!-- ADD -->
+    <div id="add" class="hidden">
+        <h1>Add New Register</h1>
+        <input type="text" id="manualId" placeholder="Enter ID manually">
+        <button class="action-button" onclick="addRegister()">Save to Database</button>
+        <div id="addNotification" class="notification"></div>
+        <button class="action-button back-button" onclick="goHome()">Back</button>
+    </div>
+
+    <!-- VIEW -->
+    <div id="view" class="hidden">
+        <h1>Database Records</h1>
+        <div class="table-container">
+            <table id="recordsTable"></table>
         </div>
+        <button class="action-button back-button" onclick="goHome()">Back</button>
     </div>
 
-    <!-- GENERATE IDs -->
-    <div id="generate" class="view">
-        <h2>Generate OccurrenceID</h2>
-        <input type="text" id="generatedId" readonly />
-        <div class="button-row">
-            <button onclick="generateId()">Generate New ID</button>
-            <button onclick="copyId()">Copy</button>
+    <!-- EDIT -->
+    <div id="edit" class="hidden">
+        <h1>Edit Database</h1>
+        <div class="table-container">
+            <table id="editTable"></table>
         </div>
-        <div id="generateStatus" class="status"></div>
-        <button class="back" onclick="showView('home')">⬅ Back</button>
-    </div>
-
-    <!-- ADD NEW REGISTER -->
-    <div id="add" class="view">
-        <h2>Add New Register</h2>
-        <input type="text" placeholder="Scientific Name" id="scientificName">
-        <input type="text" placeholder="Collector" id="collector">
-        <input type="date" id="collectionDate">
-        <button onclick="addRegister()">Save Register</button>
-        <div id="addStatus" class="status"></div>
-        <button class="back" onclick="showView('home')">⬅ Back</button>
-    </div>
-
-    <!-- VIEW DATABASE -->
-    <div id="view" class="view">
-        <h2>Database Records</h2>
-        <table id="recordsTable">
-            <thead>
-                <tr>
-                    <th>OccurrenceID</th>
-                    <th>Scientific Name</th>
-                    <th>Collector</th>
-                    <th>Date</th>
-                </tr>
-            </thead>
-            <tbody></tbody>
-        </table>
-        <button onclick="loadRecords()">Refresh</button>
-        <button class="back" onclick="showView('home')">⬅ Back</button>
-    </div>
-
-    <!-- EDIT DATABASE -->
-    <div id="edit" class="view">
-        <h2>Edit Database</h2>
-        <p>Select a record from "View Database" to edit (to be implemented).</p>
-        <button class="back" onclick="showView('home')">⬅ Back</button>
+        <button class="action-button back-button" onclick="goHome()">Back</button>
     </div>
 
 </div>
 
-<script src="/static/app.js"></script>
+<!-- Firebase Script (UNCHANGED) -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
+  import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-analytics.js";
+
+  const firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "projects-cges.firebaseapp.com",
+    projectId: "projects-cges",
+    storageBucket: "projects-cges.firebasestorage.app",
+    messagingSenderId: "620255555114",
+    appId: "1:620255555114:web:3726b649e8546f0e5f1d53",
+    measurementId: "G-87EQPE9Z8B"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const analytics = getAnalytics(app);
+</script>
+
+<!-- Your App Logic -->
+<script type="module" src="app.js"></script>
+
 </body>
 </html>
