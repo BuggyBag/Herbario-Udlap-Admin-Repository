@@ -11,12 +11,10 @@ body {
     justify-content: center;
     align-items: center;
     height: 100vh;
-    color: white;
 }
 
 .container {
     background: white;
-    color: #333;
     width: 95%;
     max-width: 600px;
     padding: 30px;
@@ -27,10 +25,10 @@ body {
 
 h1 {
     margin-bottom: 20px;
+    color: #333;
 }
 
-.menu button,
-.action-button {
+button {
     width: 100%;
     padding: 14px;
     margin: 10px 0;
@@ -43,8 +41,7 @@ h1 {
     transition: 0.3s;
 }
 
-.menu button:hover,
-.action-button:hover {
+button:hover {
     background: #1e3c72;
 }
 
@@ -85,27 +82,17 @@ input {
     text-align: left;
 }
 
-table {
-    width: 100%;
-    border-collapse: collapse;
-}
-
 td {
     padding: 8px;
     border-bottom: 1px solid #ddd;
 }
 
 .back-button {
-    margin-top: 20px;
     background: #777;
 }
 
 @media (max-width: 480px) {
     .container {
         padding: 20px;
-    }
-
-    h1 {
-        font-size: 20px;
     }
 }
