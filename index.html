@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>UDLAP Herbarium System</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+<div class="container">
+
+    <h1>UDLAP Herbarium Management System</h1>
+
+    <!-- HOME MENU -->
+    <div id="home" class="view active">
+        <div class="menu">
+            <button onclick="showView('generate')">Generate IDs</button>
+            <button onclick="showView('add')">Add New Register</button>
+            <button onclick="showView('view')">View Database</button>
+            <button onclick="showView('edit')">Edit Database</button>
+        </div>
+    </div>
+
+    <!-- GENERATE IDs -->
+    <div id="generate" class="view">
+        <h2>Generate OccurrenceID</h2>
+        <input type="text" id="generatedId" readonly />
+        <div class="button-row">
+            <button onclick="generateId()">Generate New ID</button>
+            <button onclick="copyId()">Copy</button>
+        </div>
+        <div id="generateStatus" class="status"></div>
+        <button class="back" onclick="showView('home')">⬅ Back</button>
+    </div>
+
+    <!-- ADD NEW REGISTER -->
+    <div id="add" class="view">
+        <h2>Add New Register</h2>
+        <input type="text" placeholder="Scientific Name" id="scientificName">
+        <input type="text" placeholder="Collector" id="collector">
+        <input type="date" id="collectionDate">
+        <button onclick="addRegister()">Save Register</button>
+        <div id="addStatus" class="status"></div>
+        <button class="back" onclick="showView('home')">⬅ Back</button>
+    </div>
+
+    <!-- VIEW DATABASE -->
+    <div id="view" class="view">
+        <h2>Database Records</h2>
+        <table id="recordsTable">
+            <thead>
+                <tr>
+                    <th>OccurrenceID</th>
+                    <th>Scientific Name</th>
+                    <th>Collector</th>
+                    <th>Date</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+        <button onclick="loadRecords()">Refresh</button>
+        <button class="back" onclick="showView('home')">⬅ Back</button>
+    </div>
+
+    <!-- EDIT DATABASE -->
+    <div id="edit" class="view">
+        <h2>Edit Database</h2>
+        <p>Select a record from "View Database" to edit (to be implemented).</p>
+        <button class="back" onclick="showView('home')">⬅ Back</button>
+    </div>
+
+</div>
+
+<script src="/static/app.js"></script>
+</body>
+</html>
