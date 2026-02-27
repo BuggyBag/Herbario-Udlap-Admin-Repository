@@ -24,7 +24,7 @@
         <h1>Generate Occurrence ID</h1>
         <input type="text" id="generatedId" readonly placeholder="Generated ID will appear here">
         <button class="action-button" onclick="generateId()">Generate New ID</button>
-        <button class="action-button" onclick="copyToClipboard()">Copy to Clipboard</button>
+        <button class="action-button" onclick="copyToClipboard()">Copy</button>
         <div id="generateNotification" class="notification"></div>
         <button class="action-button back-button" onclick="goHome()">Back</button>
     </div>
@@ -33,7 +33,7 @@
     <div id="add" class="hidden">
         <h1>Add New Register</h1>
         <input type="text" id="manualId" placeholder="Enter ID manually">
-        <button class="action-button" onclick="addRegister()">Save to Database</button>
+        <button class="action-button" onclick="addRegister()">Save</button>
         <div id="addNotification" class="notification"></div>
         <button class="action-button back-button" onclick="goHome()">Back</button>
     </div>
@@ -58,27 +58,6 @@
 
 </div>
 
-<!-- Firebase Script (UNCHANGED) -->
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
-  import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-analytics.js";
-
-  const firebaseConfig = {
-    apiKey: "YOUR_API_KEY",
-    authDomain: "projects-cges.firebaseapp.com",
-    projectId: "projects-cges",
-    storageBucket: "projects-cges.firebasestorage.app",
-    messagingSenderId: "620255555114",
-    appId: "1:620255555114:web:3726b649e8546f0e5f1d53",
-    measurementId: "G-87EQPE9Z8B"
-  };
-
-  const app = initializeApp(firebaseConfig);
-  const analytics = getAnalytics(app);
-</script>
-
-<!-- Your App Logic -->
 <script type="module" src="app.js"></script>
-
 </body>
 </html>
