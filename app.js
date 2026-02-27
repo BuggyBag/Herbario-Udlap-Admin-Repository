@@ -1,108 +1,136 @@
-function showView(viewId) {
-    document.querySelectorAll(".view").forEach(v => v.classList.remove("active"));
-    document.getElementById(viewId).classList.add("active");
+// Firebase Core
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
+import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-analytics.js";
+
+// Firestore
+import { 
+    getFirestore, 
+    collection, 
+    addDoc, 
+    getDocs, 
+    deleteDoc, 
+    doc, 
+    query, 
+    where 
+} from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
+
+
+// YOUR EXACT CONFIG
+const firebaseConfig = {
+  apiKey: "AIzaSyAUwRhm44SWGefJFxgEOk31vv5VGeKPGNA",
+  authDomain: "projects-cges.firebaseapp.com",
+  projectId: "projects-cges",
+  storageBucket: "projects-cges.firebasestorage.app",
+  messagingSenderId: "620255555114",
+  appId: "1:620255555114:web:3726b649e8546f0e5f1d53",
+  measurementId: "G-87EQPE9Z8B"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+getAnalytics(app);
+const db = getFirestore(app);
+
+let lastGeneratedId = null;
+
+/* Navigation */
+window.showSection = function(sectionId) {
+    document.querySelectorAll('.container > div').forEach(div => div.classList.add('hidden'));
+    document.getElementById(sectionId).classList.remove('hidden');
+
+    if(sectionId === "view") loadRecords();
+    if(sectionId === "edit") loadEditRecords();
+};
+
+window.goHome = function() {
+    document.querySelectorAll('.container > div').forEach(div => div.classList.add('hidden'));
+    document.getElementById('home').classList.remove('hidden');
+};
+
+/* ID Generator */
+function generateHex() {
+    const chars = "0123456789ABCDEF";
+    let result = "";
+    for (let i = 0; i < 8; i++) {
+        result += chars[Math.floor(Math.random() * 16)];
+    }
+    return result;
 }
 
-// --------------------
-// Generate ID
-// --------------------
-async function generateId() {
-    const response = await fetch("/generate", { method: "POST" });
-    const data = await response.json();
+window.generateId = async function() {
 
-    document.getElementById("generatedId").value = data.occurrence_id;
-    setStatus("generateStatus", "New OccurrenceID generated.");
-}
-
-function copyId() {
-    const input = document.getElementById("generatedId");
-    if (!input.value) {
-        setStatus("generateStatus", "Generate an ID first.", true);
-        return;
+    if (lastGeneratedId) {
+        await saveId(lastGeneratedId);
     }
 
-    navigator.clipboard.writeText(input.value);
-    setStatus("generateStatus", "Copied to clipboard.");
+    let newId;
+    let exists = true;
+
+    while (exists) {
+        newId = "UDLAP:herbarium:" + generateHex();
+        const q = query(collection(db, "occurrence_ids"), where("id", "==", newId));
+        const snapshot = await getDocs(q);
+        exists = !snapshot.empty;
+    }
+
+    document.getElementById("generatedId").value = newId;
+    lastGeneratedId = newId;
+    showNotification("generateNotification", "Unique ID generated", true);
+};
+
+async function saveId(id) {
+    await addDoc(collection(db, "occurrence_ids"), { id: id });
 }
 
-// --------------------
-// Add Register
-// --------------------
-async function addRegister() {
-    const scientificName = document.getElementById("scientificName").value;
-    const collector = document.getElementById("collector").value;
-    const collectionDate = document.getElementById("collectionDate").value;
+window.addRegister = async function() {
+    const id = document.getElementById("manualId").value.trim();
+    if (!id) return;
 
-    const response = await fetch("/add-register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-            scientificName,
-            collector,
-            collectionDate
-        })
-    });
+    await saveId(id);
+    showNotification("addNotification", "Saved successfully", true);
+    document.getElementById("manualId").value = "";
+};
 
-    const result = await response.json();
-    setStatus("addStatus", result.message);
-}
-
-// --------------------
-// Load Records
-// --------------------
 async function loadRecords() {
-    const response = await fetch("/records");
-    const data = await response.json();
+    const table = document.getElementById("recordsTable");
+    table.innerHTML = "";
+    const snapshot = await getDocs(collection(db, "occurrence_ids"));
 
-    const tbody = document.querySelector("#recordsTable tbody");
-    tbody.innerHTML = "";
-
-    data.records.forEach(record => {
-        const row = `
-            <tr>
-                <td>${record.id}</td>
-                <td>${record.scientificName}</td>
-                <td>${record.collector}</td>
-                <td>${record.collectionDate}</td>
-            </tr>
-        `;
-        tbody.innerHTML += row;
+    snapshot.forEach(docSnap => {
+        table.innerHTML += `<tr><td>${docSnap.data().id}</td></tr>`;
     });
 }
 
-// --------------------
-// Status Helper
-// --------------------
-function setStatus(elementId, message, error=false) {
-    const el = document.getElementById(elementId);
-    el.style.color = error ? "red" : "green";
-    el.textContent = message;
+async function loadEditRecords() {
+    const table = document.getElementById("editTable");
+    table.innerHTML = "";
+    const snapshot = await getDocs(collection(db, "occurrence_ids"));
 
-    setTimeout(() => {
-        el.textContent = "";
-    }, 3000);
+    snapshot.forEach(docSnap => {
+        table.innerHTML += `
+        <tr>
+            <td>${docSnap.data().id}</td>
+            <td><button onclick="deleteRecord('${docSnap.id}')">Delete</button></td>
+        </tr>`;
+    });
 }
 
-<script type="module">
-  // Import the functions you need from the SDKs you need
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
-  import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-analytics.js";
-  // TODO: Add SDKs for Firebase products that you want to use
-  // https://firebase.google.com/docs/web/setup#available-libraries
+window.deleteRecord = async function(docId) {
+    await deleteDoc(doc(db, "occurrence_ids", docId));
+    loadEditRecords();
+};
 
-  // Your web app's Firebase configuration
-  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-  const firebaseConfig = {
-    apiKey: "AIzaSyAUwRhm44SWGefJFxgEOk31vv5VGeKPGNA",
-    authDomain: "projects-cges.firebaseapp.com",
-    projectId: "projects-cges",
-    storageBucket: "projects-cges.firebasestorage.app",
-    messagingSenderId: "620255555114",
-    appId: "1:620255555114:web:3726b649e8546f0e5f1d53",
-    measurementId: "G-87EQPE9Z8B"
-  };
+window.copyToClipboard = function() {
+    const input = document.getElementById("generatedId");
+    input.select();
+    document.execCommand("copy");
+    showNotification("generateNotification", "Copied to clipboard", true);
+};
 
-  // Initialize Firebase
-  const app = initializeApp(firebaseConfig);
-  const analytics = getAnalytics(app);
-</script>
+function showNotification(id, message, success) {
+    const box = document.getElementById(id);
+    box.innerText = message;
+    box.className = "notification " + (success ? "success" : "error");
+    box.style.display = "block";
+    setTimeout(() => box.style.display = "none", 3000);
+}
